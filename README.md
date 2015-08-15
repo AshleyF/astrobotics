@@ -47,3 +47,5 @@ Notice that ∞ is indeed blurry and it's not until about ∞-14 that it becomes
 * ∞-18 ![Focus test ∞-18](camera/focus-example/focus18.jpg)
 * ∞-19 ![Focus test ∞-19](camera/focus-example/focus19.jpg)
 * ∞-20 ![Focus test ∞-20](camera/focus-example/focus20.jpg)
+
+![Stary night](camera/focus-example/stary-night.jpg)
