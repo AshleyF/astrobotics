@@ -8,7 +8,9 @@ echo "Astrobotics Star focus" # tested on Canon 7D II
 # 4) choose a reasonable aperture
 # 5) choose focus step range
 # 6) pick the best image
-# 7) have fun!
+# 7) reset and run again with initial focus and pausing between experiments
+# 8) abort when best focus is achieved
+# 9) have fun!
 
 set -e
 

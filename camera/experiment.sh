@@ -1,69 +1,70 @@
-# experiment with setting ranges
-# tested on Canon 7D II
+#!/bin/bash
 
-# once focus is determined (focus.sh)...
-# choose a reasonable ISO range
-# choose a reasonable shutter speed range
-# choose a reasonable aperture range (wide open?)
-# run this
-# pick the best image
-# have fun!
+echo "Astrobotics experimentation" # tested on Canon 7D II
 
-focus=0
+# 1) set camera to manual, lense set to MF, stabalizer off
+# 2) choose a reasonable ISO min/max setting
+# 3) choose a reasonable min/max shutter speed
+# 4) choose a reasonable min/max aperture
+# 5) have fun!
 
-# ISO
-# 0=Auto 1=100 2=125 3=160 4=200 5=250 6=320 7=400 8=500 9=640 10=800
-# 11=1000 12=1250 13=1600 14=2000 15=2500 16=3200 17=4000 18=5000 19=6400
-# 20=8000 21=10000 22=12800 23=16000
-min_iso=10
-max_iso=23
+# set -e
 
-# Shutter Speed
-# 0=30 1=25 2=20 3=15 4=13 5=10 6=8 7=6 8=5 9=4 10=3.2 11=2.5 12=2 13=1.6
-# 14=1.3 15=1 16=0.8 17=0.6 18=0.5 19=0.4 20=0.3 21=1/4 22=1/5 23=1/6 24=1/8
-# 25=1/10 26=1/13 27=1/15 28=1/20 29=1/25 30=1/30 31=1/40 32=1/50 33=1/60
-# 34=1/80 35=1/100 36=1/125 37=1/160 38=1/200 39=1/250 40=1/320 41=1/400
-# 42=1/500 43=1/640 44=1/800 45=1/1000 46=1/1250 47=1/1600 48=1/2000 49=1/2500
-# 50=1/3200 51=1/4000 52=1/5000 53=1/6400 54=1/8000
-min_shutter=0
-max_shutter=15
+declare -a ISO=(100 125 160 200 250 320 400 500 640 800 1000 1250 1600 2000 2500 3200 4000 5000 6400 8000 10000 12800 16000)
+echo "ISO Settings:"
+for ((i=0; i<${#ISO[@]}; i++)); do
+   echo "$i) ${ISO[i]}"
+done
+read -p "Minimum ISO: " minISO
+read -p "Maximum ISO: " maxISO
 
-# aperture
-# 0=2.8 1=3.2 2=3.5 3=4 4=4.5 5=5 6=5.6 7=6.3 8=7.1 9=8 10=9 11=10 12=11 13=13
-# 14=14 15=16 16=18 17=20 18=22
-min_aperture=0
-max_aperture=0
+declare -a Shutter=(30 25 20 15 13 10 8 6 5 4 3.2 2.5 2 1.6 1.3 1 0.8 0.6 0.5 0.4 0.3 1/4 1/5 1/6 1/8 1/10 1/13 1/15 1/20 1/25 1/30 1/40 1/50 1/60 1/80 1/100 1/125 1/160 1/200 1/250 1/320 1/400 1/500 1/640 1/800 1/1000 1/1250 1/1600 1/2000 1/2500 1/3200 1/4000 1/5000 1/6400 1/8000)
+echo "Shutter Settings:"
+for ((s=0; s<${#Shutter[@]}; s++)); do
+   echo "$s) ${Shutter[s]}"
+done
+read -p "Minimum Shutter: " minShutter
+read -p "Maximum Shutter: " maxShutter
 
-# prepare
-gphoto2 --set-config imageformat=0 # set back to RAW later
-gphoto2 --force-overwrite --capture-preview # manualfocusdrive doesn't work otherwise?!
-rm capture_preview.jpg 
+# declare -a Aperture=(3.5 4 4.5 5 5.6 6.3 7.1 8 9 10 11 13 14 16 18 20 22)
+declare -a Aperture=(5.6 6.3 7.1 8 9 10 11 13 14 16 18 20 22 25 29 32 36)
+
+# use `gphoto2 --get-config aperture` to get available settings
+echo "Aperture Settings:"
+for ((a=0; a<${#Aperture[@]}; a++)); do
+   echo "$a) ${Aperture[a]}"
+done
+read -p "Minimum Aperture: " minAperture
+read -p "Maximum Aperture: " maxAperture
+
+read -p "Ready! (Remember to prime the camera)" input
+
 rm -r experiment/
 mkdir experiment/
 
-# focus
-echo "Focusing..."
-for f in {0..$focus} # set this based on earlier findings
-do
-  gphoto2 --set-config-value /main/actions/manualfocusdrive="Near 1"
-done
+echo "Setting (temporary) imageformat=JPEG"
+gphoto2 --set-config imageformat="Large Fine JPEG" # set back to RAW later
 
-# experiment
-for i in {1..11}
-do
-  gphoto2 --set-config iso=$i
-  for s in {25..25}
-  do
-    gphoto2 --set-config shutterspeed=$s
-    for a in {0..0}
-      do
-      gphoto2 --set-config aperture=$a
-      echo "Capturing ISO=$i Shutter=$s Aperture=$a"
+# run experiments
+for ((i=$minISO; i<=$maxISO; i++)); do
+  iso=${ISO[i]}
+  echo "Setting ISO=$iso"
+  gphoto2 --set-config iso=$iso
+  for ((s=$minShutter; s<=$maxShutter; s++)); do
+    shutter=${Shutter[s]}
+    echo "Setting Shutter=$shutter"
+    gphoto2 --set-config shutterspeed=$shutter
+    for ((a=$minAperture; a<=$maxAperture; a++)); do
+      aperture=${Aperture[a]}
+      echo "Setting Aperture=$aperture"
+      gphoto2 --set-config aperture=$aperture
+      echo "Capturing ISO=$iso Shutter=$shutter Aperture=$aperture"
       gphoto2 --capture-image-and-download
-      mv capt0000.jpg experiment/experiment-iso$i-shutter$s-aperture$a.jpg
+      mv capt0000.jpg experiment/experiment-iso$iso-shutter${shutter//[\/]/_}-aperture$aperture.jpg
     done
   done
 done
 
 # finish
-gphoto2 --set-config imageformat=32 # RAW
+echo "Setting imageformat=RAW"
+gphoto2 --set-config imageformat="RAW"
