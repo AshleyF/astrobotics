@@ -55,6 +55,7 @@ if [ "$transfer" != "no" ]; then
   done
 else
   echo "Capturing #$number imeages on camera"
+  gphoto2 --set-config capturetarget="Memory card"
   gphoto2 --capture-image -F $number -I 1
 fi
 
