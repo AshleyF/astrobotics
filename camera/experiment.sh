@@ -28,7 +28,6 @@ read -p "Maximum Shutter: " maxShutter
 
 # declare -a Aperture=(3.5 4 4.5 5 5.6 6.3 7.1 8 9 10 11 13 14 16 18 20 22)
 declare -a Aperture=(5.6 6.3 7.1 8 9 10 11 13 14 16 18 20 22 25 29 32 36)
-
 # use `gphoto2 --get-config aperture` to get available settings
 echo "Aperture Settings:"
 for ((a=0; a<${#Aperture[@]}; a++)); do
@@ -68,3 +67,5 @@ done
 # finish
 echo "Setting imageformat=RAW"
 gphoto2 --set-config imageformat="RAW"
+
+echo "Done!"
