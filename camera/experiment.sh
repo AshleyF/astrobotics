@@ -58,7 +58,7 @@ for ((i=$minISO; i<=$maxISO; i++)); do
       echo "Setting Aperture=$aperture"
       gphoto2 --set-config aperture=$aperture
       echo "Capturing ISO=$iso Shutter=$shutter Aperture=$aperture"
-      gphoto2 --capture-image-and-download —filename=capture.jpg
+      gphoto2 --capture-image-and-download --filename=capture.jpg
       mv capture.jpg experiment/experiment-iso$iso-shutter${shutter//[\/]/_}-aperture$aperture.jpg
     done
   done

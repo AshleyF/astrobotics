@@ -77,7 +77,7 @@ done
 echo "Running focus experiment"
 while [ $f -le $(($focusinit+$focussteps)) ]; do
   echo "Capturing Focus=$f"
-  gphoto2 --capture-image-and-download —filename=capture.jpg
+  gphoto2 --capture-image-and-download --filename=capture.jpg
   mv capture.jpg focus/focus$f.jpg
   if [ "$pause" != "no" ]; then
     read -p "Continue (default 'yes')?" input
