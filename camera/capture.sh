@@ -23,9 +23,13 @@ read -p "Shutter Setting: " shutter
 declare -a Aperture=(5.6 6.3 7.1 8 9 10 11 13 14 16 18 20 22 25 29 32 36)
 # use `gphoto2 --get-config aperture` to get available settings
 echo "${Aperture[@]}"
-read -p "Aperture Setting: " aperture
+read -p "Aperture Setting (0 if no lense): " aperture
 
 read -p "Number of Exposures: " number
+
+interval=1
+read -p "Interval seconds (default $interval): " input
+interval="${input:-$interval}"
 
 transfer="no"
 read -p "Transfer while capturing (default $transfer): " input
@@ -43,20 +47,28 @@ gphoto2 --set-config iso=$iso
 echo "Setting Shutter=$shutter"
 gphoto2 --set-config shutterspeed=$shutter
 
-echo "Setting Aperture=$aperture"
-gphoto2 --set-config aperture=$aperture
+if [ "$aperture" != "0" ]; then
+  echo "Setting Aperture=$aperture"
+  gphoto2 --set-config aperture=$aperture
+else
+  echo "No aperture setting"
+fi
 
 # capture
 if [ "$transfer" != "no" ]; then
-  for ((n=0; n<$number; n++)); do
-    echo "Capturing #$n"
-    gphoto2 --capture-image-and-download
-    mv capt0000.cr2 capture/image$n.cr2
+  for ((n=1; n<=$number; n++)); do
+    echo "Capturing #$n of $number"
+    gphoto2 --capture-image-and-download --filename=capture.cr2
+    mv capture.cr2 capture/image$n.cr2
+    if [ $interval != 1 ]; then
+      echo "Sleeping $interval..."
+      sleep $interval
+    fi
   done
 else
   echo "Capturing #$number imeages on camera"
   gphoto2 --set-config capturetarget="Memory card"
-  gphoto2 --capture-image -F $number -I 1
+  gphoto2 --capture-image -F $number -I $interval
 fi
 
 echo "Done!"
